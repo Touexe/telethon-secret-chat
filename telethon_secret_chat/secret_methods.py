@@ -429,10 +429,9 @@ class SecretChatMethods:
                                                                                                    signed=True)
         if fingerprint != key_fingerprint:
             raise SecurityError("Wrong fingerprint")
-        media = await self.client.download_file(InputEncryptedFileLocation(message.file.id, message.file.access_hash),
-                                                key=message.media.key,
-                                                iv=message.media.iv)
-        return media
+        media = await self.client.download_file(InputEncryptedFileLocation(message.file.id, message.file.access_hash))
+        decrypted_media = AES.decrypt_ige(media, key, iv)
+        return decrypted_media
 
     async def send_secret_message(self, peer_id: [int, SecretChat, InputEncryptedChat, EncryptedChat], message: str,
                                   ttl: int = 0, reply_to_id: [int, None] = None, parse_mode: typing.Optional[str] = (),
